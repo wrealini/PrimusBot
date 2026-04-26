@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file googleSheetsToken.json.
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 BLANK_CSHEET_URL = "https://docs.google.com/spreadsheets/d/1ze4m1sBRoa9giCweh2onYUpWI2jQz3AHZo1rzPAzqWo/edit?usp=sharing"
 BLANK_CSHEET_ID = "1ze4m1sBRoa9giCweh2onYUpWI2jQz3AHZo1rzPAzqWo"
