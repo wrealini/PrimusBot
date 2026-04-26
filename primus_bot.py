@@ -13,7 +13,7 @@ async def roll(ctx, *args):
     await ctx.send(embed=embedVar)
     await ctx.message.delete()
 
-f = open('token.txt')
+f = open('discordBotToken.txt')
 token = f.read()
 f.close()
 bot.run(token)

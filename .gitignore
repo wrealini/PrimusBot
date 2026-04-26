@@ -219,3 +219,6 @@ __marimo__/
 /credentials.json
 /token.txt
 token.json
+/discordBotToken.txt
+/googleSheetsToken.json
+/worldAnvilUserToken.txt
