@@ -95,8 +95,6 @@ class playerCharacter:
         except sqlite3.Error as e:
             print(f"The error '{e}' occurred")
             try:
-                # c.execute("UPDATE playerCharacters SET name = ?, level = ?, classAndLevel = ? WHERE csheet_id = ?",("Siatas Soniathrym",5,"War Wizard 5 Hope Paladin 4 Hexblade Warlock 1","1ze4m1sBRoa9giCweh2onYUpWI2jQz3AHZo1rzPAzqWo"))
-                # conn.commit()
                 command = "UPDATE playerCharacters SET "
                 for csrange in CSHEET_RANGE:
                     command = command+csrange+" = ?, "
@@ -106,12 +104,23 @@ class playerCharacter:
             except sqlite3.Error as e:
                 print(f"The error '{e}' occurred")
 
+    def readDatabase(self,csheet_id):
+        try:
+            cursor.execute("SELECT * FROM playerCharacters WHERE csheet_id = ?",(csheet_id,))
+            rows = cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"The error '{e}' occurred")
+        if not rows:
+            return
+        print(rows)
+
 
 pc1 = playerCharacter(BLANK_CSHEET_URL)
 pc1.updateDatabase()
-cursor.execute("SELECT * FROM playerCharacters")
-rows = cursor.fetchall()
-for row in rows:
-    print(row)
+pc1.readDatabase(BLANK_CSHEET_ID)
+# cursor.execute("SELECT * FROM playerCharacters")
+# rows = cursor.fetchall()
+# for row in rows:
+#     print(row)
 
-connection.close()
+# connection.close()
