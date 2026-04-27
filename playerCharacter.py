@@ -12,8 +12,10 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 BLANK_CSHEET_URL = "https://docs.google.com/spreadsheets/d/1ze4m1sBRoa9giCweh2onYUpWI2jQz3AHZo1rzPAzqWo/edit?usp=sharing"
 BLANK_CSHEET_ID = "1ze4m1sBRoa9giCweh2onYUpWI2jQz3AHZo1rzPAzqWo"
 CSHEET_URL_HEADER = "https://docs.google.com/spreadsheets/d/"
-CSHEET_NAME_RANGE = "v2.1!C6"
-
+CSHEET_RANGE = ["name","level","classAndLevel","race","experience",
+                "strAP","strAPBonus","strScore","strMod","dexAP","dexAPBonus","dexScore","dexMod",
+                "conAP","conAPBonus","conScore","conMod","intAP","intAPBonus","intScore","intMod",
+                "wisAP","wisAPBonus","wisScore","wisMod","chaAP","chaAPBonus","chaScore","chaMod"]
 
 creds = None
   # The file googleSheetsToken.json stores the user's access and refresh tokens, and is
@@ -34,36 +36,82 @@ if not creds or not creds.valid:
     with open("googleSheetsToken.json", "w") as token:
         token.write(creds.to_json())
 
+import sqlite3
+from sqlite3 import Error
+
+try:
+    connection = sqlite3.connect("playerCharacters.db")
+    print("Connection to SQLite DB successful")
+except Error as e:
+    print(f"The error '{e}' occurred")
+cursor = connection.cursor()
+command = '''Create TABLE if not exists playerCharacters('''
+for csrange in CSHEET_RANGE:
+    command = command+csrange+''' TEXT, '''
+command = command+'''csheet_url TEXT, csheet_id TEXT PRIMARY KEY)'''
+cursor.execute(command)
+
 class playerCharacter:
-  def __init__(self,url):
-    self.url = url
-    
-    if not self.url.startswith(CSHEET_URL_HEADER):
-        return
-    self.spreadsheet_id = self.url.replace(CSHEET_URL_HEADER,"")
-    self.spreadsheet_id = self.spreadsheet_id.partition("/")[0]
-
-    try:
-        service = build("sheets", "v4", credentials=creds)
-
-        # Call the Sheets API
-        sheet = service.spreadsheets()
-        result = (
-            sheet.values()
-            .get(spreadsheetId=self.spreadsheet_id, range=CSHEET_NAME_RANGE)
-            .execute()
-        )
-        values = result.get("values", [])
-
-        if not values:
-            print("No data found.")
+    def __init__(self,url):
+        self.url = url
+        
+        if not self.url.startswith(CSHEET_URL_HEADER):
             return
+        self.spreadsheet_id = self.url.replace(CSHEET_URL_HEADER,"")
+        self.spreadsheet_id = self.spreadsheet_id.partition("/")[0]
 
-        print("Name, Major:")
-        for row in values:
-        # Print columns A and E, which correspond to indices 0 and 4.
-            print(f"{row[0]}")
-    except HttpError as err:
-        print(err)
+        try:
+            service = build("sheets", "v4", credentials=creds)
+
+            # Call the Sheets API
+            sheet = service.spreadsheets()
+            values = sheet.values()
+            result = values.batchGet(spreadsheetId=self.spreadsheet_id, ranges=CSHEET_RANGE).execute().get("valueRanges", [])
+
+            if not result:
+                print("No data found.")
+                return
+
+            self.data = dict()
+            for i in range(len(CSHEET_RANGE)):
+                self.data.update({CSHEET_RANGE[i]: result[i].get("values", [[""]])[0][0]})
+
+            print("Character Sheet gsheet loading successful")
+            print("URL: "+self.url)
+            print("SPREADSHEET_ID: "+self.spreadsheet_id)
+            # for i in range(len(CSHEET_RANGE)):
+            #     print(CSHEET_RANGE[i]+": "+str(self.data.get(CSHEET_RANGE[i])))
+        except HttpError as err:
+            print(err)
+
+    def updateDatabase(self):
+        try:
+            cdata = dict(self.data)
+            cdata.update({"csheet_url":self.url,"csheet_id":self.spreadsheet_id})
+            cdata = tuple(cdata.values())
+            command = "INSERT INTO playerCharacters VALUES("+("?,"*len(CSHEET_RANGE))+"?,?)"
+            cursor.execute(command,cdata)
+            connection.commit()
+        except sqlite3.Error as e:
+            print(f"The error '{e}' occurred")
+            try:
+                # c.execute("UPDATE playerCharacters SET name = ?, level = ?, classAndLevel = ? WHERE csheet_id = ?",("Siatas Soniathrym",5,"War Wizard 5 Hope Paladin 4 Hexblade Warlock 1","1ze4m1sBRoa9giCweh2onYUpWI2jQz3AHZo1rzPAzqWo"))
+                # conn.commit()
+                command = "UPDATE playerCharacters SET "
+                for csrange in CSHEET_RANGE:
+                    command = command+csrange+" = ?, "
+                command = command+"csheet_url = ? WHERE csheet_id = ?"
+                cursor.execute(command,cdata)
+                connection.commit()
+            except sqlite3.Error as e:
+                print(f"The error '{e}' occurred")
+
 
 pc1 = playerCharacter(BLANK_CSHEET_URL)
+pc1.updateDatabase()
+cursor.execute("SELECT * FROM playerCharacters")
+rows = cursor.fetchall()
+for row in rows:
+    print(row)
+
+connection.close()

@@ -222,3 +222,5 @@ token.json
 /discordBotToken.txt
 /googleSheetsToken.json
 /worldAnvilUserToken.txt
+/*.sqlite
+/*.db
