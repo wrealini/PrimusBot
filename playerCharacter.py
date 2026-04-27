@@ -111,16 +111,24 @@ class playerCharacter:
         except sqlite3.Error as e:
             print(f"The error '{e}' occurred")
         if not rows:
-            return
-        print(rows)
+            return False
+        if len(rows[0]) != len(CSHEET_RANGE)+2:
+            return False
+        cdata = dict()
+        for i in range(len(CSHEET_RANGE)):
+            cdata.update({CSHEET_RANGE[i]: rows[0][i]})
+        self.data = cdata
+        self.url = rows[0][len(CSHEET_RANGE)]
+        self.spreadsheet_id = rows[0][len(CSHEET_RANGE)+1]
+        return True
 
 
 pc1 = playerCharacter(BLANK_CSHEET_URL)
 pc1.updateDatabase()
 pc1.readDatabase(BLANK_CSHEET_ID)
-# cursor.execute("SELECT * FROM playerCharacters")
-# rows = cursor.fetchall()
-# for row in rows:
-#     print(row)
+cursor.execute("SELECT * FROM playerCharacters")
+rows = cursor.fetchall()
+for row in rows:
+    print(row)
 
-# connection.close()
+connection.close()
