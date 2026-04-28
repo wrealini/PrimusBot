@@ -224,3 +224,4 @@ token.json
 /worldAnvilUserToken.txt
 /*.sqlite
 /*.db
+/gmailPassword.txt
