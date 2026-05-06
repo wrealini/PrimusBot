@@ -1,5 +1,6 @@
 import os
-from flask import Flask
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import threading
 import discord
 import json
@@ -16,6 +17,7 @@ def talespire_message_cleanup_loop():
 
 ## Create Flask web app
 app = Flask(__name__)
+cors = CORS(app)
 
 # http://192.168.4.34:9090/
 @app.route("/")
@@ -28,6 +30,14 @@ def hello_world():
 def talespire_output():
     global talespire_message
     return json.dumps(talespire_message)
+
+# http://192.168.4.34:9090/receiver
+@app.route("/receiver", methods=["POST"])
+def post_input():
+   data = request.get_json()
+   print(data)
+   data = jsonify(data)
+   return data
 
 ## Create discord bot
 class MyClient(discord.Client):
