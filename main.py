@@ -13,7 +13,7 @@ def talespire_message_cleanup_loop():
     print("Starting talespire message cleanup loop...")
     while True:
         talespire_message = dict()
-        time.sleep(5)
+        time.sleep(1)
 
 ## Create Flask web app
 app = Flask(__name__)
