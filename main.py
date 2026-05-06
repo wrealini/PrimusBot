@@ -52,7 +52,7 @@ class MyClient(discord.Client):
         if msg.startswith("roll "):
             msg = msg.replace("roll ","")
             global talespire_message
-            talespire_message[str(message.author)] = dict(roll = msg)
+            talespire_message[str(message.author)] = {"roll":{"name":"Roll","dice":msg}}
             embedVar = discord.Embed(title="Roll", description=msg)
             await message.channel.send(embed=embedVar)
             await message.delete()
