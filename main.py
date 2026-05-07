@@ -8,12 +8,12 @@ import time
 
 ## Create talespire message global variable and cleanup loop function
 talespire_message = dict()
-def talespire_message_cleanup_loop():
-    global talespire_message
-    print("Starting talespire message cleanup loop...")
-    while True:
-        talespire_message = dict()
-        time.sleep(1)
+# def talespire_message_cleanup_loop():
+#     global talespire_message
+#     print("Starting talespire message cleanup loop...")
+#     while True:
+#         talespire_message = dict()
+#         time.sleep(1)
 
 ## Create Flask web app
 app = Flask(__name__)
@@ -36,6 +36,14 @@ def talespire_output():
 def post_input():
    data = request.get_json()
    print(data)
+   global talespire_message
+   try:
+       discordid = data.get("source")
+       message = data.get("message")
+       if json.dumps(talespire_message.get(discordid)) == json.dumps(message):
+           talespire_message.pop(discordid)
+   finally:
+       print(data)
    data = jsonify(data)
    return data
 
@@ -74,7 +82,7 @@ if __name__ == "__main__":
     ## Create each thread
     threads = []
     threads.append(threading.Thread(target=run_discord_bot))
-    threads.append(threading.Thread(target=talespire_message_cleanup_loop))
+    # threads.append(threading.Thread(target=talespire_message_cleanup_loop))
     # Start each thread
     for t in threads:
         t.start()
