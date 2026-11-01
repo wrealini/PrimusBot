@@ -225,3 +225,4 @@ token.json
 /*.sqlite
 /*.db
 /gmailPassword.txt
+.nicegui/*.json
