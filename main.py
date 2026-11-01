@@ -44,12 +44,19 @@ async def main(request: Request) -> RedirectResponse | None:
             ui.tab('A')
             ui.tab('B')
             ui.tab('C')
+        with ui.button(on_click=lambda: right_drawer.toggle()).props('no-caps').classes('ml-auto'):
+            ui.label(f'Hi {user_info.get("name") or user_info.get("email", "")}!')
+            ui.image(user_info.get("picture")) \
+                .classes('rounded-full size-8 ml-4')
 
     with ui.footer(value=False) as footer:
         ui.label('Footer')
 
     with ui.left_drawer().classes('bg-blue-100') as left_drawer:
-        ui.label('Side menu')
+        ui.label('Left menu')
+
+    with ui.right_drawer().classes('bg-blue-100') as right_drawer:
+        ui.label('Right menu')
         ui.label(f'Welcome {user_info.get("name") or user_info.get("email", "")}!')
         ui.button('Logout', on_click=logout)
 
