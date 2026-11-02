@@ -45,7 +45,7 @@ async def main(request: Request) -> RedirectResponse | None:
             ui.tab('B')
             ui.tab('C')
         with ui.button(on_click=lambda: right_drawer.toggle()).props('no-caps').classes('ml-auto'):
-            ui.label(f'Hi {user_info.get("name") or user_info.get("email", "")}!')
+            unlabel = ui.label(f'Hi {user_info.get("name") or user_info.get("email", "")}!')
             ui.image(user_info.get("picture")) \
                 .classes('rounded-full size-8 ml-4')
 
@@ -56,8 +56,15 @@ async def main(request: Request) -> RedirectResponse | None:
         ui.label('Left menu')
 
     with ui.right_drawer().classes('bg-blue-100') as right_drawer:
-        ui.label('Right menu')
-        ui.label(f'Welcome {user_info.get("name") or user_info.get("email", "")}!')
+        untextbox = ui.input(label='Update Username', placeholder='start typing',
+            # on_change=lambda e: result.set_text('you typed: ' + e.value),
+            validation={'Username must be between 3 and 21 characters': lambda value: len(value) < 21 and len(value) > 2})
+        def update_username():
+            if untextbox.validate():
+                app.storage.user['user_info'].update({"name":untextbox.value})
+                user_info = app.storage.user.get('user_info', {})
+                unlabel.set_text(f'Hi {user_info.get("name") or user_info.get("email", "")}!')
+        untextbox.on('keydown.enter',update_username)
         ui.button('Logout', on_click=logout)
 
     with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
