@@ -44,9 +44,9 @@ async def main(request: Request) -> RedirectResponse | None:
     user_db_info = {"email":user_info.get("email", ""),
                     "discord":'',
                     "name":user_info.get("name") or user_info.get("email", ""),
-                    "pfp":user_info.get("picture")}
+                    "pfp":user_info.get("picture"),
+                    "dorl":False}
     user_db_info = await models.User.get_or_create(defaults=user_db_info, email=user_info.get("email", ""))
-    # user_db_info = await models.User.get(email=user_info.get("email", ""))
     
     with ui.header().classes(replace='row items-center') as header:
         ui.button(on_click=lambda: left_drawer.toggle(), icon='menu').props('flat color=white')
@@ -67,7 +67,6 @@ async def main(request: Request) -> RedirectResponse | None:
 
     with ui.right_drawer().classes('bg-blue-100') as right_drawer:
         untextbox = ui.input(label='Update Username', placeholder='Start typing...',
-            # on_change=lambda e: result.set_text('you typed: ' + e.value),
             validation={'Username must be between 3 and 40 characters': lambda value: len(value) < 41 and len(value) > 2})
         async def update_username():
             if untextbox.validate():
@@ -75,6 +74,12 @@ async def main(request: Request) -> RedirectResponse | None:
                 await user_db_info[0].save()
                 unlabel.set_text(f'Hi {user_db_info[0].name}!')
         untextbox.on('keydown.enter',update_username)
+        dark = ui.dark_mode()
+        async def update_dorl():
+            user_db_info[0].dorl = dorlswtich.value
+            await user_db_info[0].save()
+        dorlswtich = ui.switch('Dark Mode',on_change=update_dorl).bind_value(dark)
+        dorlswtich.set_value(user_db_info[0].dorl)
         ui.button('Logout', on_click=logout)
 
     with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):

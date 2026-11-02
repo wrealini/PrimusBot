@@ -7,4 +7,5 @@ class User(models.Model):
     discord = fields.CharField(max_length=50)
     name = fields.CharField(max_length=50) #255
     pfp = fields.CharField(max_length=100)
+    dorl = fields.BooleanField()
     # age = fields.IntField()
