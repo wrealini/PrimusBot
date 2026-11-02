@@ -7,7 +7,12 @@ from authlib.integrations.starlette_client import OAuth, OAuthError
 from fastapi import Request
 from starlette.responses import RedirectResponse
 
+import models
+from tortoise.contrib.fastapi import register_tortoise
+
 from nicegui import app, ui
+
+register_tortoise(app, db_url='sqlite://db.sqlite3', modules={'models': ['models']}, generate_schemas=True)
 
 # Get the credentials from the Google Cloud Console.
 # See https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid#get_your_google_api_client_id.
@@ -35,8 +40,13 @@ async def main(request: Request) -> RedirectResponse | None:
     if not _is_valid(user_info):
         app.storage.user.pop('user_info', None)
         return await oauth.google.authorize_redirect(request, request.url_for('google_oauth'))
-
     
+    user_db_info = {"email":user_info.get("email", ""),
+                    "discord":'',
+                    "name":user_info.get("name") or user_info.get("email", ""),
+                    "pfp":user_info.get("picture")}
+    user_db_info = await models.User.get_or_create(defaults=user_db_info, email=user_info.get("email", ""))
+    # user_db_info = await models.User.get(email=user_info.get("email", ""))
     
     with ui.header().classes(replace='row items-center') as header:
         ui.button(on_click=lambda: left_drawer.toggle(), icon='menu').props('flat color=white')
@@ -45,8 +55,8 @@ async def main(request: Request) -> RedirectResponse | None:
             ui.tab('B')
             ui.tab('C')
         with ui.button(on_click=lambda: right_drawer.toggle()).props('no-caps').classes('ml-auto'):
-            unlabel = ui.label(f'Hi {user_info.get("name") or user_info.get("email", "")}!')
-            ui.image(user_info.get("picture")) \
+            unlabel = ui.label(f'Hi {user_db_info[0].name}!')
+            ui.image(user_db_info[0].pfp) \
                 .classes('rounded-full size-8 ml-4')
 
     with ui.footer(value=False) as footer:
@@ -56,14 +66,14 @@ async def main(request: Request) -> RedirectResponse | None:
         ui.label('Left menu')
 
     with ui.right_drawer().classes('bg-blue-100') as right_drawer:
-        untextbox = ui.input(label='Update Username', placeholder='start typing',
+        untextbox = ui.input(label='Update Username', placeholder='Start typing...',
             # on_change=lambda e: result.set_text('you typed: ' + e.value),
-            validation={'Username must be between 3 and 21 characters': lambda value: len(value) < 21 and len(value) > 2})
-        def update_username():
+            validation={'Username must be between 3 and 40 characters': lambda value: len(value) < 41 and len(value) > 2})
+        async def update_username():
             if untextbox.validate():
-                app.storage.user['user_info'].update({"name":untextbox.value})
-                user_info = app.storage.user.get('user_info', {})
-                unlabel.set_text(f'Hi {user_info.get("name") or user_info.get("email", "")}!')
+                user_db_info[0].name = untextbox.value
+                await user_db_info[0].save()
+                unlabel.set_text(f'Hi {user_db_info[0].name}!')
         untextbox.on('keydown.enter',update_username)
         ui.button('Logout', on_click=logout)
 

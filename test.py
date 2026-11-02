@@ -1,28 +1,42 @@
 #!/usr/bin/env python3
-from nicegui import ui
+import models
+from tortoise.contrib.fastapi import register_tortoise
 
-with ui.header().classes(replace='row items-center') as header:
-    ui.button(on_click=lambda: left_drawer.toggle(), icon='menu').props('flat color=white')
-    with ui.tabs() as tabs:
-        ui.tab('A')
-        ui.tab('B')
-        ui.tab('C')
+from nicegui import app, ui
 
-with ui.footer(value=False) as footer:
-    ui.label('Footer')
+register_tortoise(app, db_url='sqlite://db.sqlite3', modules={'models': ['models']}, generate_schemas=True)
 
-with ui.left_drawer().classes('bg-blue-100') as left_drawer:
-    ui.label('Side menu')
 
-with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
-    ui.button(on_click=footer.toggle, icon='contact_support').props('fab')
+@ui.refreshable
+async def list_of_users() -> None:
+    async def delete(user: models.User) -> None:
+        await user.delete()
+        list_of_users.refresh()
 
-with ui.tab_panels(tabs, value='A').classes('w-full'):
-    with ui.tab_panel('A'):
-        ui.label('Content of A')
-    with ui.tab_panel('B'):
-        ui.label('Content of B')
-    with ui.tab_panel('C'):
-        ui.label('Content of C')
+    users: list[models.User] = await models.User.all()
+    for user in reversed(users):
+        with ui.card():
+            with ui.row().classes('items-center'):
+                ui.input('Name', on_change=user.save) \
+                    .bind_value(user, 'name').on('blur', list_of_users.refresh)
+                ui.number('Age', on_change=user.save, format='%.0f') \
+                    .bind_value(user, 'age').on('blur', list_of_users.refresh).classes('w-20')
+                ui.button(icon='delete', on_click=lambda u=user: delete(u)).props('flat')
+
+
+@ui.page('/')
+async def index():
+    async def create() -> None:
+        await models.User.create(name=name.value, age=age.value or 0)
+        name.value = ''
+        age.value = None
+        list_of_users.refresh()
+
+    with ui.column().classes('mx-auto'):
+        with ui.row().classes('w-full items-center px-4'):
+            name = ui.input(label='Name')
+            age = ui.number(label='Age', format='%.0f').classes('w-20')
+            ui.button(on_click=create, icon='add').props('flat').classes('ml-auto')
+        await list_of_users()
 
 ui.run()
