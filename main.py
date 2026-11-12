@@ -96,24 +96,34 @@ async def main(request: Request) -> RedirectResponse | None:
                 pfp.force_reload()
             ui.button('Use Gmail Picture',on_click=gmail_pfp)
             async def select_pfp():
-                print("select_pfp")
                 jstxt = """
+                    function pickerCallback(data) {
+                        let url = 'nothing';
+                        if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+                            const doc = data[google.picker.Response.DOCUMENTS][0];
+                            url = doc[google.picker.Document.URL];
+                        }
+                        getHtmlElement(LABEL_ID).innerText = url;
+                    }
+
                     const picker = new google.picker.PickerBuilder()
                         .addView(google.picker.ViewId.DOCS)
                         .setOAuthToken('ACCESS_TOKEN')
                         .setDeveloperKey('API_KEY')
+                        .setCallback(pickerCallback)
                         .setAppId('APP_ID')
+                        .setSelectableMimeTypes('image/png,image/jpeg')
                         .build();
                     picker.setVisible(true);
                 """
+                jstxt = jstxt.replace("LABEL_ID",str(label.id))
                 jstxt = jstxt.replace("API_KEY",GOOGLE_API_KEY)
-                print(f"API_KEY: {GOOGLE_API_KEY}")
-                jstxt = jstxt.replace("APP_ID",access_token["id_token"])
-                print(f"APP_ID: {access_token["id_token"]}")
+                jstxt = jstxt.replace("APP_ID",GOOGLE_PROJECT_NUMBER)
                 jstxt = jstxt.replace("ACCESS_TOKEN",access_token["access_token"])
-                print(f"ACCESS_TOKEN: {access_token["access_token"]}")
+                print(json.dumps(access_token))
                 ui.run_javascript(jstxt, timeout=5.0)
             sgdp = ui.button('Select Google Drive Picture',on_click=select_pfp).disable()
+            label = ui.label()
 
             ui.separator()
 
