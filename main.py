@@ -152,7 +152,7 @@ async def main(request: Request) -> RedirectResponse | None:
 
     ui.add_head_html(f'<script src="https://www.google.com/jsapi?key={GOOGLE_API_KEY}"></script>')
     ui.add_head_html('<script src="https://apis.google.com/js/client.js?onload=SetPicker"></script>')
-    await ui.run_javascript(f"gapi.client.setApiKey('{GOOGLE_API_KEY}');\ngapi.client.load('drive', 'v2', null);\ngapi.load('picker',null);", timeout=5.0)
+    await ui.run_javascript("gapi.load('picker',null);", timeout=5.0)
     print('Picker API loaded')
     sgdp.enable()
     
