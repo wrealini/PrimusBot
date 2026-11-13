@@ -33,7 +33,7 @@ oauth.register(
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_id=GOOGLE_CLIENT_ID,
     client_secret=GOOGLE_CLIENT_SECRET,
-    client_kwargs={'scope': 'openid email profile https://www.googleapis.com/auth/drive'},
+    client_kwargs={'scope': 'openid email profile https://www.googleapis.com/auth/drive', 'prompt': 'consent'},
 )
 
 DEFAULT_PFP = 'https://i.imgur.com/tdi3NGa.png'
@@ -152,7 +152,7 @@ async def main(request: Request) -> RedirectResponse | None:
 
     ui.add_head_html(f'<script src="https://www.google.com/jsapi?key={GOOGLE_API_KEY}"></script>')
     ui.add_head_html('<script src="https://apis.google.com/js/client.js?onload=SetPicker"></script>')
-    await ui.run_javascript(f"gapi.client.setApiKey('{GOOGLE_API_KEY}');\ngapi.client.load('drive', 'v2');\ngapi.load('picker',null);", timeout=5.0)
+    await ui.run_javascript(f"gapi.client.setApiKey('{GOOGLE_API_KEY}');\ngapi.client.load('drive', 'v2', null);\ngapi.load('picker',null);", timeout=5.0)
     print('Picker API loaded')
     sgdp.enable()
     
