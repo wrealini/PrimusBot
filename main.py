@@ -19,13 +19,14 @@ register_tortoise(app, db_url='sqlite://db.sqlite3', modules={'models': ['models
 # For local development, you should add http://localhost:8080 to the authorized JavaScript origins.
 # In production, you should add the domain of your website to the authorized JavaScript origins.
 # Make sure you include <origin>/auth in "Authorized redirect URIs".
-with open('credentials.json', 'r') as f:
+ctype = "web"
+with open(f'credentials_{ctype}.json', 'r') as f:
     creds = json.load(f)
-    GOOGLE_CLIENT_ID = creds["installed"]["client_id"]
-    GOOGLE_CLIENT_SECRET = creds["installed"]["client_secret"]
-    GOOGLE_PROJECT_ID = creds["installed"]["project_id"]
-    GOOGLE_API_KEY = creds["installed"]["api_key"]
-    GOOGLE_PROJECT_NUMBER = creds["installed"]["project_number"]
+    GOOGLE_CLIENT_ID = creds[ctype]["client_id"]
+    GOOGLE_CLIENT_SECRET = creds[ctype]["client_secret"]
+    GOOGLE_PROJECT_ID = creds[ctype]["project_id"]
+    GOOGLE_API_KEY = creds[ctype]["api_key"]
+    GOOGLE_PROJECT_NUMBER = creds[ctype]["project_number"]
 
 oauth = OAuth()
 oauth.register(
@@ -106,13 +107,15 @@ async def main(request: Request) -> RedirectResponse | None:
                         getHtmlElement(LABEL_ID).innerText = url;
                     }
 
+                    const view = new google.picker.View(google.picker.ViewId.DOCS);
+                    view.setMimeTypes('image/png,image/jpeg,image/jpg');
                     const picker = new google.picker.PickerBuilder()
                         .addView(google.picker.ViewId.DOCS)
                         .setOAuthToken('ACCESS_TOKEN')
                         .setDeveloperKey('API_KEY')
                         .setCallback(pickerCallback)
                         .setAppId('APP_ID')
-                        .setSelectableMimeTypes('image/png,image/jpeg')
+                        .addView(view)
                         .build();
                     picker.setVisible(true);
                 """

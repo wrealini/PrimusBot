@@ -216,7 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-/credentials.json
 /token.txt
 token.json
 /discordBotToken.txt
@@ -228,3 +227,4 @@ token.json
 .nicegui/*.json
 db.sqlite3-shm
 db.sqlite3-wal
+credentials*.json
