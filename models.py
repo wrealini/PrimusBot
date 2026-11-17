@@ -9,3 +9,9 @@ class User(models.Model):
     pfp = fields.CharField(max_length=100)
     dorl = fields.BooleanField()
     # age = fields.IntField()
+
+class PlayerCharacter(models.Model):
+    id = fields.IntField(pk=True)
+    userid = fields.IntField()
+    name = fields.CharField(max_length=50)
+    pfp = fields.CharField(max_length=100)
