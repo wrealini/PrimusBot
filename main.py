@@ -59,9 +59,9 @@ async def main(request: Request) -> RedirectResponse | None:
     with ui.header().classes(replace='row items-center') as header:
         ui.button(on_click=lambda: left_drawer.toggle(), icon='menu').props('flat color=white')
         with ui.tabs() as tabs:
-            ui.tab('A')
-            ui.tab('B')
-            ui.tab('C')
+            ui.tab('Rulebooks')
+            ui.tab('My Characters')
+            ui.tab('My Games')
         with ui.button(on_click=lambda: right_drawer.toggle()).props('no-caps').classes('ml-auto'):
             unlabel = ui.label(f'Hi {user_db_info[0].name}!')
             pfp = ui.image(user_db_info[0].pfp).classes('rounded-full size-8 ml-4')
@@ -144,17 +144,19 @@ async def main(request: Request) -> RedirectResponse | None:
     with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
         ui.button(on_click=footer.toggle, icon='contact_support').props('fab')
 
-    with ui.tab_panels(tabs, value='A').classes('w-full'):
-        with ui.tab_panel('A'):
-            ui.label('Content of A')
-        with ui.tab_panel('B'):
-            ui.label('Content of B')
-        with ui.tab_panel('C'):
-            ui.label('Content of C')
+    with ui.tab_panels(tabs, value='Rulebooks').classes('w-full'):
+        with ui.tab_panel('Rulebooks'):
+            with ui.link(target='https://www.worldanvil.com/w/planescape-orenji/c/player-s-handbook-category'):
+                ui.image('https://wa-cdn.nyc3.digitaloceanspaces.com/user-data/production/254fe151-4fe6-4bcc-aa04-5d4d1174c22b/uploads/images/2d76932ee1e50c4f7853721662dbadf7.png').classes('w-64')
+        with ui.tab_panel('My Characters'):
+            ui.label('Content of My Characters')
+        with ui.tab_panel('My Games'):
+            ui.label('Content of My Games')
+            
 
 
-    ui.add_head_html(f'<script src="https://www.google.com/jsapi?key={GOOGLE_API_KEY}"></script>')
-    ui.add_head_html('<script src="https://apis.google.com/js/client.js?onload=SetPicker"></script>')
+    ui.add_head_html(f'<script src="https://apis.google.com/js/api.js"></script>')
+    ui.add_head_html('<script src="https://accounts.google.com/gsi/client"></script>')
     await ui.run_javascript("gapi.load('picker',null);", timeout=5.0)
     print('Picker API loaded')
     sgdp.enable()
