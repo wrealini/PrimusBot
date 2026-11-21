@@ -150,6 +150,13 @@ async def main(request: Request) -> RedirectResponse | None:
                 ui.image('https://wa-cdn.nyc3.digitaloceanspaces.com/user-data/production/254fe151-4fe6-4bcc-aa04-5d4d1174c22b/uploads/images/2d76932ee1e50c4f7853721662dbadf7.png').classes('w-64')
         with ui.tab_panel('My Characters'):
             ui.label('Content of My Characters')
+            with ui.card().tight():
+                with ui.image('https://wa-cdn.nyc3.cdn.digitaloceanspaces.com/assets/prod/prodromos-client/images/WorldCover_Default.jpg').classes('w-128 h-32'):
+                    ui.image(DEFAULT_PFP).classes('rounded-full size-26 ml-4 mt-4')
+                    ui.label('Unnamed Character').classes('ml-40 mr-4 mt-16 text-lg w-full')
+                with ui.card_section():
+                    with ui.grid(columns=1).classes('items-start'):
+                        ui.button('Create New Character').classes('w-full')
         with ui.tab_panel('My Games'):
             ui.label('Content of My Games')
             
