@@ -149,14 +149,39 @@ async def main(request: Request) -> RedirectResponse | None:
             with ui.link(target='https://www.worldanvil.com/w/planescape-orenji/c/player-s-handbook-category'):
                 ui.image('https://wa-cdn.nyc3.digitaloceanspaces.com/user-data/production/254fe151-4fe6-4bcc-aa04-5d4d1174c22b/uploads/images/2d76932ee1e50c4f7853721662dbadf7.png').classes('w-64')
         with ui.tab_panel('My Characters'):
-            with ui.card().tight():
-                with ui.image('https://wa-cdn.nyc3.cdn.digitaloceanspaces.com/assets/prod/prodromos-client/images/WorldCover_Default.jpg').classes('w-128 h-32'):
-                    ui.image(DEFAULT_PFP).classes('rounded-full size-26 ml-4 mt-4')
-                    ui.label('Unnamed Character').classes('ml-40 mr-4 mt-16 text-lg w-full')
-                with ui.card_section():
-                    with ui.grid(columns=2).classes('items-start'):
-                        ui.button('Edit')
-                        ui.button('Delete')
+            ui.label('Active Characters').classes('text-xl')
+            with ui.grid(columns=3).classes('items-start'):
+                actcharactercards = [ui.card().tight().classes('bg-blue-100 dark:bg-gray-800')] * 9
+                for i in range(0, 9):
+                    if i > 0:
+                        actcharactercards[i] = ui.card().tight().classes('bg-blue-100 dark:bg-gray-800')
+                    # actcharactercards[i].visible = False
+                    with actcharactercards[i]:
+                        with ui.image('https://wa-cdn.nyc3.cdn.digitaloceanspaces.com/assets/prod/prodromos-client/images/WorldCover_Default.jpg').classes('w-128 h-32'):
+                            ui.image(DEFAULT_PFP).classes('rounded-full size-26 ml-4 mt-4')
+                            ui.label('Unnamed Character').classes('ml-40 mr-4 mt-16 text-lg w-full')
+                        with ui.card_section():
+                            with ui.grid(columns=2).classes('items-start'):
+                                ui.button('View')
+                                ui.button('Edit')
+
+            ui.separator()
+
+            ui.label('Proposed Characters').classes('text-xl')
+            with ui.grid(columns=3).classes('items-start'):
+                wipcharactercards = [ui.card().tight().classes('bg-blue-100 dark:bg-gray-800')] * 3
+                for i in range(0, 3):
+                    if i > 0:
+                        wipcharactercards[i] = ui.card().tight().classes('bg-blue-100 dark:bg-gray-800')
+                    # wipcharactercards[i].visible = False
+                    with wipcharactercards[i]:
+                        with ui.image('https://wa-cdn.nyc3.cdn.digitaloceanspaces.com/assets/prod/prodromos-client/images/WorldCover_Default.jpg').classes('w-128 h-32'):
+                            ui.image(DEFAULT_PFP).classes('rounded-full size-26 ml-4 mt-4')
+                            ui.label('Unnamed Character').classes('ml-40 mr-4 mt-16 text-lg w-full')
+                        with ui.card_section():
+                            with ui.grid(columns=2).classes('items-start'):
+                                ui.button('Edit')
+                                ui.button('Delete')
             ui.button('Create New Character').classes('w-full')
         with ui.tab_panel('My Games'):
             ui.label('Content of My Games')
