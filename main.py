@@ -67,7 +67,8 @@ async def main(request: Request) -> RedirectResponse | None:
             pfp = ui.image(user_db_info[0].pfp).classes('rounded-full size-8 ml-4')
 
     with ui.footer(value=False) as footer:
-        ui.label('Footer')
+        with ui.link(target='https://www.worldanvil.com/w/planescape-orenji/',new_tab=True).classes('ml-auto'):
+            ui.image('https://uploads.worldanvil.com/uploads/images/701fdc15b3c49d7089f99940c166a30b.png').classes('size-12').tooltip('World Anvil setting page')
 
     with ui.left_drawer().classes('bg-blue-100 dark:bg-gray-800').set_value(False) as left_drawer:
         ui.label('Left menu')
@@ -142,7 +143,7 @@ async def main(request: Request) -> RedirectResponse | None:
             ui.button('Logout', on_click=logout)
 
     with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
-        ui.button(on_click=footer.toggle, icon='contact_support').props('fab')
+        ui.button(on_click=footer.toggle, icon='contact_support').props('fab').tooltip('Important links')
 
     with ui.tab_panels(tabs, value='Rulebooks').classes('w-full'):
         with ui.tab_panel('Rulebooks'):
