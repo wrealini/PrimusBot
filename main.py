@@ -34,7 +34,7 @@ oauth.register(
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_id=GOOGLE_CLIENT_ID,
     client_secret=GOOGLE_CLIENT_SECRET,
-    client_kwargs={'scope': 'openid email profile https://www.googleapis.com/auth/drive', 'prompt': 'consent'},
+    client_kwargs={'scope': 'openid email profile https://www.googleapis.com/auth/drive'}#, 'prompt': 'consent'},
 )
 
 DEFAULT_PFP = 'https://i.imgur.com/tdi3NGa.png'
@@ -56,12 +56,12 @@ async def main(request: Request) -> RedirectResponse | None:
                     "dorl":False}
     user_db_info = await models.User.get_or_create(defaults=user_db_info, email=user_info.get("email", ""))
     
-    with ui.header().classes(replace='row items-center') as header:
+    with ui.header().classes(replace='row items-center') as main_header:
         ui.button(on_click=lambda: left_drawer.toggle(), icon='menu').props('flat color=white')
-        with ui.tabs() as tabs:
-            ui.tab('Rulebooks')
-            ui.tab('My Characters')
-            ui.tab('My Games')
+        with ui.tabs() as major_tabs:
+            ui.tab('Home')
+            ui.tab('Player Dashboard')
+            ui.tab('Dungeon Master Dashboard')
         with ui.button(on_click=lambda: right_drawer.toggle()).props('no-caps').classes('ml-auto'):
             unlabel = ui.label(f'Hi {user_db_info[0].name}!')
             pfp = ui.image(user_db_info[0].pfp).classes('rounded-full size-8 ml-4')
@@ -145,11 +145,30 @@ async def main(request: Request) -> RedirectResponse | None:
     with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
         ui.button(on_click=footer.toggle, icon='contact_support').props('fab').tooltip('Important links')
 
-    with ui.tab_panels(tabs, value='Rulebooks').classes('w-full'):
-        with ui.tab_panel('Rulebooks'):
-            with ui.link(target='https://www.worldanvil.com/w/planescape-orenji/c/player-s-handbook-category'):
-                ui.image('https://wa-cdn.nyc3.digitaloceanspaces.com/user-data/production/254fe151-4fe6-4bcc-aa04-5d4d1174c22b/uploads/images/2d76932ee1e50c4f7853721662dbadf7.png').classes('w-64')
-        with ui.tab_panel('My Characters'):
+    with ui.tab_panels(major_tabs, value='Home').classes('w-full'):
+        with ui.tab_panel('Home'):
+            with ui.tabs() as home_tabs:
+                ui.tab('Welcome')
+                ui.tab('Sourcebooks')
+            with ui.tab_panels(home_tabs, value='Welcome').classes('w-full'):
+                with ui.tab_panel('Welcome'):
+                    ui.add_head_html(r'''
+                        <style>
+                        @keyframes fade {
+                        0%   {opacity: 0;}
+                        50%  {opacity: 0;}
+                        100% {opacity: 1.0;}
+                        }
+                        </style>
+                        ''')
+                    with ui.image('https://i.imgur.com/KMmGpDa.jpeg'):#https://2014.5e.tools/img/book/SatO/047-03-001.splash.webp'):
+                        ui.image('https://i.imgur.com/xXhFTAs.jpeg').style('animation: fade 5s')
+                        ui.image('https://i.imgur.com/WThSwYv.jpeg').style('animation: fade 10s')
+                        ui.image('https://i.imgur.com/q5mrcNV.jpeg').style('animation: fade 15s')
+                with ui.tab_panel('Sourcebooks'):
+                    with ui.link(target='https://www.worldanvil.com/w/planescape-orenji/c/player-s-handbook-category'):
+                        ui.image('https://wa-cdn.nyc3.digitaloceanspaces.com/user-data/production/254fe151-4fe6-4bcc-aa04-5d4d1174c22b/uploads/images/2d76932ee1e50c4f7853721662dbadf7.png').classes('w-64')
+        with ui.tab_panel('Player Dashboard'):
             ui.label('Active Characters').classes('text-xl')
             with ui.grid(columns=3).classes('items-start'):
                 actcharactercards = [ui.card().tight().classes('bg-blue-100 dark:bg-gray-800')] * 9
@@ -184,7 +203,7 @@ async def main(request: Request) -> RedirectResponse | None:
                                 ui.button('Edit')
                                 ui.button('Delete')
             ui.button('Create New Character').classes('w-full')
-        with ui.tab_panel('My Games'):
+        with ui.tab_panel('Dungeon Master Dashboard'):
             ui.label('Content of My Games')
             
 
