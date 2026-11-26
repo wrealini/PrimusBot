@@ -66,10 +66,6 @@ async def main(request: Request) -> RedirectResponse | None:
             unlabel = ui.label(f'Hi {user_db_info[0].name}!')
             pfp = ui.image(user_db_info[0].pfp).classes('rounded-full size-8 ml-4')
 
-    with ui.footer(value=False) as footer:
-        with ui.link(target='https://www.worldanvil.com/w/planescape-orenji/',new_tab=True).classes('ml-auto'):
-            ui.image('https://uploads.worldanvil.com/uploads/images/701fdc15b3c49d7089f99940c166a30b.png').classes('size-12').tooltip('World Anvil setting page')
-
     with ui.left_drawer().classes('bg-blue-100 dark:bg-gray-800').set_value(False) as left_drawer:
         ui.label('Left menu')
 
@@ -142,9 +138,6 @@ async def main(request: Request) -> RedirectResponse | None:
 
             ui.button('Logout', on_click=logout)
 
-    with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
-        ui.button(on_click=footer.toggle, icon='contact_support').props('fab').tooltip('Important links')
-
     with ui.tab_panels(major_tabs, value='Home').classes('w-full'):
         with ui.tab_panel('Home'):
             with ui.tabs() as home_tabs:
@@ -167,7 +160,7 @@ async def main(request: Request) -> RedirectResponse | None:
                         ui.image('https://i.imgur.com/q5mrcNV.jpeg').style('animation: fade 15s')
                 with ui.tab_panel('Sourcebooks'):
                     with ui.link(target='https://www.worldanvil.com/w/planescape-orenji/c/player-s-handbook-category'):
-                        ui.image('https://wa-cdn.nyc3.digitaloceanspaces.com/user-data/production/254fe151-4fe6-4bcc-aa04-5d4d1174c22b/uploads/images/2d76932ee1e50c4f7853721662dbadf7.png').classes('w-64')
+                        ui.image('https://wa-cdn.nyc3.digitaloceanspaces.com/user-data/production/254fe151-4fe6-4bcc-aa04-5d4d1174c22b/uploads/images/2d76932ee1e50c4f7853721662dbadf7.png').classes('w-75')
         with ui.tab_panel('Player Dashboard'):
             ui.label('Active Characters').classes('text-xl')
             with ui.grid(columns=3).classes('items-start'):
